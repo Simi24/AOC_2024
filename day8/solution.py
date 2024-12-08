@@ -40,16 +40,14 @@ def findNumberOfAntinodes():
                     a2 = (round(n2[0] + dx * distance), round(n2[1] + dy * distance))
 
                     #Part 1
-                    """
-                    if (a1[0] >= 0 and a1[0] < len(grid)) and (a1[1] >= 0 and a1[1] < len(grid[0])):
-                        if antinodesMap[a1[0]][a1[1]] == False:
-                            antinodesMap[a1[0]][a1[1]] = True
-                            antinodes += 1
-                    if (a2[0] >= 0 and a2[0] < len(grid)) and (a2[1] >= 0 and a2[1] < len(grid[0])):
-                        if antinodesMap[a2[0]][a2[1]] == False:
-                            antinodesMap[a2[0]][a2[1]] = True
-                            antinodes += 1
-                    """
+                    # if (a1[0] >= 0 and a1[0] < len(grid)) and (a1[1] >= 0 and a1[1] < len(grid[0])):
+                    #     if antinodesMap[a1[0]][a1[1]] == False:
+                    #         antinodesMap[a1[0]][a1[1]] = True
+                    #         antinodes += 1
+                    # if (a2[0] >= 0 and a2[0] < len(grid)) and (a2[1] >= 0 and a2[1] < len(grid[0])):
+                    #     if antinodesMap[a2[0]][a2[1]] == False:
+                    #         antinodesMap[a2[0]][a2[1]] = True
+                    #         antinodes += 1
 
                     #Part 2
                     while (a1[0] >= 0 and a1[0] < len(grid)) and (a1[1] >= 0 and a1[1] < len(grid[0])):
