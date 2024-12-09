@@ -12,9 +12,9 @@ def parseInput():
             process_line(line)
 
 def process_line(line):
-    blocks = []
-    occurrences = {}
-    spaces = {}
+    global blocks
+    global occurrences
+    global spaces
 
     index = 0
     indexSpaces = 0
@@ -39,10 +39,6 @@ def process_line(line):
             occurrences[index] = int(line[i])
             index -= 1
 
-    print(blocks)
-    print(occurrences)
-    print(spaces)
-
 def reorderBlocks():
     l, r = 0, len(blocks) - 1
 
@@ -65,43 +61,57 @@ def findChecksum():
     
     return ret
 
-def reorderBlocks2():
-    line = [int(n) for n in _line.strip()]
-    print(line)
-    occurrence = []
+def parse_disk_map(filename):
+    with open(filename) as file:
+        line = file.read().strip()
     
-    #move to the right to the left
-    for i in range(len(line)-1, -1, -1):
-        if i % 2 == 0:
-            
-            #move to left from right to find a space
-            for j in range(len(line)):
-                
-                if j % 2 != 0:
-                    if line[i] <= line[j]:
-                        print("elemento da fittare ", line[i])
-                        print("spazio trovato ",line[j])
-                        print("indice spazio ", j)
-                        for n in range(line[i]):
-                            occurrence.append(i//2)
-                        line[j] -= line[i]
-                        line[i] = 0
-                        print(line)
-                        break
-    
-    print(line)
-    print(occurrence)
+    disk_map = [int(x) for x in line]
+    return disk_map
 
-    s = ''.join(str(x) for x in line)
-    print(s)
-    print(process_line(s))
+def compact_smart(disk_map):
+    file_positions = []
+    gap_positions = []
+    current_position = 0
     
+    for i, size in enumerate(disk_map):
+        if i % 2 == 0:
+            file_positions.append((i // 2, size, current_position))
+        elif size > 0:
+            gap_positions.append((size, current_position))
+        current_position += size
+    
+    moved_files = []
+    for file_id, size, position in reversed(file_positions):
+        for i, (gap_size, gap_position) in enumerate(gap_positions):
+            if gap_position > position:
+                moved_files.append((file_id, size, position))
+                break
+            if gap_size < size:
+                continue
+            moved_files.append((file_id, size, gap_position))
+            gap_positions[i] = (gap_size - size, gap_position + size)
+            break
+        else:
+            moved_files.append((file_id, size, position))
+    
+    return moved_files
+
+def smart_checksum(file_positions):
+    return sum(file_id * (position * size + size * (size - 1) // 2) for file_id, size, position in file_positions)
+
+def part1():
+    parseInput()
+    reorderBlocks()
+    return findChecksum()
+
+def part2(filename):
+    disk_map = parse_disk_map(filename)
+    moved_files = compact_smart(disk_map)
+    return smart_checksum(moved_files)
 
 def main():
-    parseInput()
-    #reorderBlocks()
-    #print(findChecksum())
-    reorderBlocks2()
+    print("Part 1:", part1())
+    print("Part 2:", part2("inputTest.txt"))
 
 if __name__ == "__main__":
     main()
