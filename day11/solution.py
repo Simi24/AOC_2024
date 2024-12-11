@@ -1,8 +1,4 @@
-# - If the stone is engraved with the number 0, it is replaced by a stone engraved with the number 1.
-# - If the stone is engraved with a number that has an even number of digits, it is replaced by two stones.
-#   The left half of the digits are engraved on the new left stone, and the right half of the digits are engraved on the new right stone.
-#   (The new numbers don't keep extra leading zeroes: 1000 would become stones 10 and 0.)
-# - If none of the other rules apply, the stone is replaced by a new stone; the old stone's number multiplied by 2024 is engraved on the new stone.
+from collections import defaultdict
 
 stones = []
 
@@ -15,25 +11,34 @@ def parseInput():
 
 def stonesAfterNSeconds(n):
     global stones
-    for i in range(n):
-        new_stones = []
-        for stone in stones:
+    stone_count = defaultdict(int)
+    for stone in stones:
+        stone_count[stone] += 1
+
+    for _ in range(n):
+        new_stone_count = defaultdict(int)
+        for stone, count in stone_count.items():
             if stone == 0:
-                new_stones.extend([1])
+                new_stone_count[1] += count
             elif len(str(stone)) % 2 == 0:
                 half = len(str(stone)) // 2
-                new_stones.extend([int(str(stone)[:half]), int(str(stone)[half:])])
+                left = int(str(stone)[:half])
+                right = int(str(stone)[half:])
+                new_stone_count[left] += count
+                new_stone_count[right] += count
             else:
-                new_stones.extend([stone * 2024])
-        stones = new_stones
-        # print(stones)
-    return stones
+                new_stone_count[stone * 2024] += count
+        stone_count = new_stone_count
+
+    tot_count = sum(stone_count.values())
+    
+    print(tot_count)
+    return tot_count
 
 def main():
     global stones
     parseInput()
     stonesAfterNSeconds(75)
-    print(len(stones))
 
 
 if __name__ == "__main__":
