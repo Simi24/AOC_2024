@@ -1,3 +1,4 @@
+import heapq
 import networkx as nx
 
 grid = []
@@ -18,13 +19,40 @@ def parse_input():
         for i in range(len(grid)):
             for j in range(len(grid[i])):
                 if grid[i][j] == "S":
-                    initial_position = (j, i)
+                    initial_position = (i, j)
                 elif grid[i][j] == "E":
-                    desination = (j, i)
+                    desination = (i, j)
         
         print(f"Initial position: {initial_position}")
         print(f"Desination: {desination}")
         print("\n".join("".join(row) for row in grid))
+
+def find_path_bfs_priority(labyrinth, start, end):
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    direction_names = ['N', 'S', 'W', 'E']
+    rows, cols = len(labyrinth), len(labyrinth[0])
+
+    pq = [(0, start[0], start[1], 'E')]
+    visited = set()
+
+    while pq:
+        current_cost, x, y, current_dir = heapq.heappop(pq)
+
+        if (x, y) == end:
+            return current_cost
+
+        if (x, y, current_dir) in visited:
+            continue
+        visited.add((x, y, current_dir))
+
+        for i, (dx, dy) in enumerate(directions):
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < rows and 0 <= ny < cols and labyrinth[nx][ny] != '#':
+                turn_cost = 1000 if current_dir != direction_names[i] else 0
+                total_cost = current_cost + 1 + turn_cost
+                heapq.heappush(pq, (total_cost, nx, ny, direction_names[i]))
+
+    return -1
 
 def build_graph_with_weights(labyrinth):
     directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # Nord, Sud, Ovest, Est
@@ -48,7 +76,7 @@ def build_graph_with_weights(labyrinth):
     return G
 
 def find_shortest_path_with_networkx(labyrinth, start, end):
-    directions = ['N', 'S', 'W', 'E']  # Direzioni iniziali possibili
+    directions = ['N', 'S', 'W', 'E']
     
     G = build_graph_with_weights(labyrinth)
     
@@ -116,6 +144,7 @@ def main():
     parse_input()
     print(f"Path cost with NetworkX: {find_shortest_path_with_networkx(grid, initial_position, desination)}")
     print(f"Paths: {len(find_all_shortest_paths_with_networkx(grid, initial_position, desination))}")
+    print(f"Path cost with BFS: {find_path_bfs_priority(grid, initial_position, desination)}")
 
 if __name__ == "__main__":
     main()
