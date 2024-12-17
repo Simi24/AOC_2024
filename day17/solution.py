@@ -15,7 +15,7 @@ class Computer:
         self.output = ""
         self.instruction_pointer = 0
         while self.instruction_pointer < len(self.program) - 1:
-            self.get_instruction()
+            self.execute_instruction()
         return self.output
     
     #Utility functions
@@ -39,7 +39,7 @@ class Computer:
     def get_operand(self):
         return self.program[self.instruction_pointer + 1]
     
-    def get_instruction(self):
+    def execute_instruction(self):
         if self.program[self.instruction_pointer] == 0:
             return self.adv()
         elif self.program[self.instruction_pointer] == 1:
