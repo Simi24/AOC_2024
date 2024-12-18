@@ -1,5 +1,6 @@
 import math
 
+
 class Computer:
 
     output = ""
@@ -17,15 +18,15 @@ class Computer:
         while self.instruction_pointer < len(self.program) - 1:
             self.execute_instruction()
         return self.output
-    
-    #Utility functions
+
+    # Utility functions
 
     def print_output(self):
         print(self.output)
-    
+
     def print_registers(self):
         print(f"A: {self.A}, B: {self.B}, C: {self.C}")
-    
+
     def get_value_combo_operand(self, operand):
         if operand >= 0 and operand <= 3:
             return operand
@@ -35,10 +36,10 @@ class Computer:
             return self.B
         elif operand == 6:
             return self.C
-    
+
     def get_operand(self):
         return self.program[self.instruction_pointer + 1]
-    
+
     def execute_instruction(self):
         if self.program[self.instruction_pointer] == 0:
             return self.adv()
@@ -56,59 +57,66 @@ class Computer:
             return self.bdv()
         elif self.program[self.instruction_pointer] == 7:
             return self.cdv()
-    
+
     def set_registers(self, A, B, C):
         self.A = A
         self.B = B
         self.C = C
-    
+
     def set_program(self, program):
         self.program = program
-    
-    #Instructions
-    
+
+    # Instructions
+
     def adv(self):
-        self.A = int(self.A // math.pow(2, self.get_value_combo_operand(self.get_operand())))
+        self.A = int(
+            self.A // math.pow(2, self.get_value_combo_operand(self.get_operand()))
+        )
         self.instruction_pointer += 2
-    
+
     def bxl(self):
-        #Bitwise XOR
+        # Bitwise XOR
         self.B = self.B ^ self.get_operand()
         self.instruction_pointer += 2
-    
+
     def bst(self):
         self.B = self.get_value_combo_operand(self.get_operand()) % 8
         self.instruction_pointer += 2
-    
+
     def jnz(self):
         if self.A != 0:
             self.instruction_pointer = self.get_operand()
         else:
             self.instruction_pointer += 2
-    
+
     def bxc(self):
         operand = self.get_operand()
         self.B = self.B ^ self.C
         self.instruction_pointer += 2
-    
+
     def out(self):
         if len(self.output) > 0:
             self.output += ","
         self.output += str(self.get_value_combo_operand(self.get_operand()) % 8)
         self.instruction_pointer += 2
-    
+
     def bdv(self):
-        self.B = int(self.A // math.pow(2, self.get_value_combo_operand(self.get_operand())))
+        self.B = int(
+            self.A // math.pow(2, self.get_value_combo_operand(self.get_operand()))
+        )
         self.instruction_pointer += 22
-    
+
     def cdv(self):
-        self.C = int(self.A // math.pow(2, self.get_value_combo_operand(self.get_operand())))
+        self.C = int(
+            self.A // math.pow(2, self.get_value_combo_operand(self.get_operand()))
+        )
         self.instruction_pointer += 2
 
 
 registers = []
 program = []
 computer = Computer(0, 0, 0, program)
+
 
 def parse_input():
     global registers
@@ -123,10 +131,14 @@ def parse_input():
             elif line != "\n":
                 reg = int(line.split(":")[1].strip())
                 registers.append(reg)
-    
+
     computer.set_registers(registers[0], registers[1], registers[2])
     computer.set_program(program)
+
+
 import heapq
+
+
 def main():
     global computer
     parse_input()
@@ -142,7 +154,7 @@ def main():
         offset, a = heapq.heappop(variants)
 
         for i in range(8):
-            next_a = (a << 3) + i #shift left by 3 bits -> multiply by 8
+            next_a = (a << 3) + i  # shift left by 3 bits -> multiply by 8
             computer.set_registers(next_a, 0, 0)
             output = computer.run().split(",")
             expected_output = [str(x) for x in program[offset:]]
@@ -154,6 +166,7 @@ def main():
                 heapq.heappush(variants, (offset - 1, next_a))
 
     print("No A found")
+
 
 if __name__ == "__main__":
     main()

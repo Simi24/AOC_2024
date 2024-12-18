@@ -2,6 +2,7 @@ matrix = []
 rows = 0
 cols = 0
 
+
 def parseInput():
     global matrix, rows, cols
     with open("input.txt") as file:
@@ -11,6 +12,7 @@ def parseInput():
             matrix.append([int(x) for x in row])
     rows = len(matrix)
     cols = len(matrix[0])
+
 
 # Find the neighbors of a node (vertial and horizontal)
 def get_neighbors(node):
@@ -25,15 +27,16 @@ def get_neighbors(node):
         neighbors.append((i, j - 1))
     if j < cols - 1:  # right
         neighbors.append((i, j + 1))
-    
+
     return neighbors
+
 
 def find_paths(start_node, current_value):
     global matrix, rows, cols
-    stack = [(start_node, current_value)] 
+    stack = [(start_node, current_value)]
     paths_to_9 = 0
     unique_paths_to_9 = 0
-    visited9 = set() 
+    visited9 = set()
 
     while stack:
         node, value = stack.pop()
@@ -47,13 +50,15 @@ def find_paths(start_node, current_value):
                     paths_to_9 += 1
                 else:
                     stack.append((neighbor, matrix[ni][nj]))
-    
+
     return paths_to_9, unique_paths_to_9
 
 
 def findValidPaths():
     global matrix, rows, cols
-    start_nodes = [(i, j) for i in range(rows) for j in range(cols) if matrix[i][j] == 0]
+    start_nodes = [
+        (i, j) for i in range(rows) for j in range(cols) if matrix[i][j] == 0
+    ]
 
     total_paths = 0
     total_unique_paths = 0
@@ -63,9 +68,9 @@ def findValidPaths():
         total_paths += paths
         total_unique_paths += unique_paths
 
-    #Part 1    
+    # Part 1
     print("Total unique paths to 9: ", total_unique_paths)
-    #Part 2
+    # Part 2
     print("Total paths to 9: ", total_paths)
 
     return total_paths
@@ -74,6 +79,7 @@ def findValidPaths():
 def main():
     parseInput()
     findValidPaths()
+
 
 if __name__ == "__main__":
     main()

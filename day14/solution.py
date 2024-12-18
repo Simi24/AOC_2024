@@ -1,4 +1,4 @@
-class Robot():
+class Robot:
     def __init__(self, p, v):
         self.p = p
         self.v = v
@@ -35,7 +35,9 @@ class Robot():
     def print(self):
         print(f"Position: {self.p}, Velocity: {self.v}")
 
+
 robots = []
+
 
 def parse_input():
     with open("input.txt") as file:
@@ -52,11 +54,11 @@ def parse_input():
             v = (vx, vy)
             robot = Robot(p, v)
             robots.append(robot)
-    
+
 
 def find_final_position():
     global robots
-    
+
     row_len = 101
     columns = 103
     # for robot in robots:
@@ -69,7 +71,7 @@ def find_final_position():
         positions = set()
         for robot in robots:
             robot.move(row_len, columns)
-        
+
         for robot in robots:
             if robot.p in positions:
                 break
@@ -80,8 +82,9 @@ def find_final_position():
             print(f"Seconds: {i + 1}")
             draw_matrix_with_robots(row_len, columns)
             break
-        
+
         positions.clear()
+
 
 def draw_matrix_with_robots(row_len, columns):
     global robots
@@ -92,7 +95,7 @@ def draw_matrix_with_robots(row_len, columns):
         else:
             matrix[robot.p[1]][robot.p[0]] = 1
     print("\n".join(" ".join(f"{cell:>2}" for cell in row) for row in matrix))
-    
+
     def find_robots_in_quadrants():
         q1 = 0
         q2 = 0
@@ -113,12 +116,14 @@ def draw_matrix_with_robots(row_len, columns):
                     q4 += matrix[r][c]
 
         print(f"Q1 * Q2 * Q3 * Q4: {q1 * q2 * q3 * q4}")
-    
+
     find_robots_in_quadrants()
+
 
 def main():
     parse_input()
     find_final_position()
+
 
 if __name__ == "__main__":
     main()

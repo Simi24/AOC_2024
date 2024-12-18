@@ -2,12 +2,14 @@ from collections import defaultdict
 
 stones = []
 
+
 def parseInput():
     with open("input.txt") as file:
         for line in file:
             stones.extend([int(x) for x in line.strip().split()])
-        
+
         print(stones)
+
 
 def stonesAfterNSeconds(n):
     global stones
@@ -31,9 +33,10 @@ def stonesAfterNSeconds(n):
         stone_count = new_stone_count
 
     tot_count = sum(stone_count.values())
-    
+
     print(tot_count)
     return tot_count
+
 
 def main():
     global stones

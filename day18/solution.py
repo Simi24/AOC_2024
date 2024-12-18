@@ -1,6 +1,8 @@
 from collections import deque
 
 _bytes = []
+
+
 def parse_input():
     global _bytes
     with open("input.txt") as file:
@@ -8,12 +10,14 @@ def parse_input():
             l = line.strip().split(",")
             _bytes.append((int(l[1]), int(l[0])))
 
+
 def create_matrix():
-    matrix = [['.' for x in range(71)] for y in range(71)]
+    matrix = [["." for x in range(71)] for y in range(71)]
     for i in range(1024):
-        matrix[_bytes[i][0]][_bytes[i][1]] = '#'
+        matrix[_bytes[i][0]][_bytes[i][1]] = "#"
 
     return matrix
+
 
 def find_shortest_path_bfs(labyrinth, start, end):
     directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
@@ -33,22 +37,24 @@ def find_shortest_path_bfs(labyrinth, start, end):
 
         for i, (dx, dy) in enumerate(directions):
             nx, ny = x + dx, y + dy
-            if 0 <= nx < rows and 0 <= ny < cols and labyrinth[nx][ny] != '#':
+            if 0 <= nx < rows and 0 <= ny < cols and labyrinth[nx][ny] != "#":
                 total_dist = current_dist + 1
                 pq.append((total_dist, nx, ny))
 
     return -1
 
+
 def find_first_blocking_block(matrix):
     for i in range(1024, 3451):
-        matrix[_bytes[i][0]][_bytes[i][1]] = '#'
+        matrix[_bytes[i][0]][_bytes[i][1]] = "#"
         if find_shortest_path_bfs(matrix, (0, 0), (70, 70)) == -1:
             return (_bytes[i][1], _bytes[i][0])
+
 
 def main():
     parse_input()
     matrix = create_matrix()
-    
+
     print("Shortest path: ", find_shortest_path_bfs(matrix, (0, 0), (70, 70)))
     print("First blocking block: ", find_first_blocking_block(matrix))
 
