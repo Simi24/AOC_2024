@@ -15,7 +15,7 @@ def create_matrix():
 
     return matrix
 
-def find_path_bfs_priority(labyrinth, start, end):
+def find_shortest_path_bfs(labyrinth, start, end):
     directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
     rows, cols = len(labyrinth), len(labyrinth[0])
 
@@ -42,14 +42,14 @@ def find_path_bfs_priority(labyrinth, start, end):
 def find_first_blocking_block(matrix):
     for i in range(1024, 3451):
         matrix[_bytes[i][0]][_bytes[i][1]] = '#'
-        if find_path_bfs_priority(matrix, (0, 0), (70, 70)) == -1:
+        if find_shortest_path_bfs(matrix, (0, 0), (70, 70)) == -1:
             return (_bytes[i][1], _bytes[i][0])
 
 def main():
     parse_input()
     matrix = create_matrix()
     
-    print("Shortest path: ", find_path_bfs_priority(matrix, (0, 0), (70, 70)))
+    print("Shortest path: ", find_shortest_path_bfs(matrix, (0, 0), (70, 70)))
     print("First blocking block: ", find_first_blocking_block(matrix))
 
 
