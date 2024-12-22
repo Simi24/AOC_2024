@@ -1,4 +1,5 @@
 from collections import defaultdict
+from time import time
 
 initial_secrets_numbers = []
 
@@ -32,6 +33,7 @@ def get_next_secret_number(secret_number):
 
 
 def solve():
+    time_start = time()
     sum = 0
     deltas = []
     for number in initial_secrets_numbers:
@@ -44,7 +46,7 @@ def solve():
         sum += secret_number
         deltas.append(changes)
 
-    print(sum)
+    print(sum, round(time() - time_start))
 
     bananas = defaultdict(int)
     for changes in deltas:
@@ -55,7 +57,7 @@ def solve():
                 bananas[sequence] += changes[i + 3][1]
                 seen.add(sequence)
 
-    print(max(bananas.values()))
+    print(max(bananas.values()), round(time() - time_start))
 
 
 solve()
