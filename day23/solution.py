@@ -1,7 +1,5 @@
 import networkx
-from collections import defaultdict
 import matplotlib.pyplot as plt
-from itertools import combinations
 
 edges = []
 
@@ -26,19 +24,11 @@ def draw_graph(G):
     plt.show()
 
 
-def find_triplets_nx(G):
-    triplets = []
-    for triplet in combinations(G.nodes, 3):
-        if (
-            G.has_edge(triplet[0], triplet[1])
-            and G.has_edge(triplet[0], triplet[2])
-            and G.has_edge(triplet[1], triplet[2])
-        ):
-            triplets.append(triplet)
-    return triplets
+def find_triplets(G):
+    return [c for c in networkx.enumerate_all_cliques(G) if len(c) == 3]
 
 
-def find_max_clique_nx(G):
+def find_max_clique(G):
     return max(networkx.find_cliques(G), key=len)
 
 
@@ -49,11 +39,11 @@ def filter_triplets(triplets):
 def main():
     parse_input()
     G = create_graph()
-    triplets = find_triplets_nx(G)
+    triplets = find_triplets(G)
     filtered_triplets = filter_triplets(triplets)
     # Part 1
     print(len(filtered_triplets))
-    max_clique = find_max_clique_nx(G)
+    max_clique = find_max_clique(G)
     # Part 2
     print(",".join(sorted(max_clique)))
 
