@@ -54,8 +54,6 @@ def main():
     final_ports = []
     for key, value in initial_port_state.items():
         if key.startswith("z"):
-            # print(key, value)
-
             final_ports.append((key, value))
 
     final_ports.sort(reverse=True)
