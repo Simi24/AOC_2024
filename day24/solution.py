@@ -1,67 +1,100 @@
 from collections import defaultdict
 
-initial_port_state = defaultdict(str)
-operations = []
 
+class BinaryAdder:
+    def __init__(self):
+        self.forward_gates = {}
+        self.reverse_gates = {}
+        self.output_wires = set()
 
-def parse_input():
-    with open("input.txt") as file:
-        lines = file.readlines()
-        for line in lines:
-            if line.__contains__(":"):
-                _port = line.split(":")
-                initial_port_state[_port[0]] = int(_port[1].strip())
-            elif line.__contains__("->"):
-                _operation = line.split("->")
-                operations.append((_operation[0].strip().split(), _operation[1].strip()))
+    def parse_input(self, filename):
+        with open(filename) as file:
+            lines = file.readlines()
+            reading_wires = True
 
-    print(initial_port_state)
-    print(operations)
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    reading_wires = False
+                    continue
 
+                if reading_wires:
+                    continue
+                else:
+                    if "->" in line:
+                        left, output = line.split("->")
+                        parts = left.strip().split()
+                        input1, op, input2 = parts
+                        output = output.strip()
 
-def AND(input1, input2):
-    return 1 if input1 == 1 and input2 == 1 else 0
+                        if input1 > input2:
+                            input1, input2 = input2, input1
 
+                        self.forward_gates[(input1, input2, op)] = output
+                        self.reverse_gates[output] = (input1, input2, op)
 
-def OR(input1, input2):
-    return 1 if input1 == 1 or input2 == 1 else 0
+    def swap_wires(self, wire1, wire2):
+        """Scambia gli output di due gate"""
+        gate1 = self.reverse_gates[wire1]
+        gate2 = self.reverse_gates[wire2]
 
+        self.forward_gates[gate1], self.forward_gates[gate2] = self.forward_gates[gate2], self.forward_gates[gate1]
+        self.reverse_gates[wire1], self.reverse_gates[wire2] = self.reverse_gates[wire2], self.reverse_gates[wire1]
 
-def XOR(input1, input2):
-    return 1 if input1 != input2 else 0
+    def find_swapped_wires(self):
+        max_bit = 0
+        for wire in self.reverse_gates:
+            if wire.startswith("z") and wire[1:].isdigit():
+                max_bit = max(max_bit, int(wire[1:]))
 
+        carry = ""
+        for i in range(max_bit):
+            x = f"x{i:02}"
+            y = f"y{i:02}"
+            z = f"z{i:02}"
 
-def solve(operations, initial_port_state):
-    while operations:
-        for operation in operations:
-            if operation[0][0] in initial_port_state and operation[0][2] in initial_port_state:
-                res = 0
-                if operation[0][1] == "AND":
-                    res = AND(initial_port_state[operation[0][0]], initial_port_state[operation[0][2]])
-                elif operation[0][1] == "OR":
-                    res = OR(initial_port_state[operation[0][0]], initial_port_state[operation[0][2]])
-                elif operation[0][1] == "XOR":
-                    res = XOR(initial_port_state[operation[0][0]], initial_port_state[operation[0][2]])
+            xor_out = self.forward_gates.get((x, y, "XOR"))
+            and_out = self.forward_gates.get((x, y, "AND"))
 
-                initial_port_state[operation[1]] = res
-                operations.remove(operation)
+            if not carry:
+                carry = and_out
+            else:
+                a, b = (carry, xor_out) if carry <= xor_out else (xor_out, carry)
+                key = (a, b, "XOR")
+
+                if key not in self.forward_gates:
+                    gate_inputs = set(self.reverse_gates[z][:2])
+                    key_inputs = {a, b}
+                    swapped_wires = list(gate_inputs ^ key_inputs)
+                    self.output_wires.add(swapped_wires[0])
+                    self.output_wires.add(swapped_wires[1])
+                    self.swap_wires(swapped_wires[0], swapped_wires[1])
+                elif self.forward_gates[key] != z:
+                    current_output = self.forward_gates[key]
+                    self.output_wires.add(current_output)
+                    self.output_wires.add(z)
+                    self.swap_wires(z, current_output)
+
+                xor_out = self.forward_gates.get((x, y, "XOR"))
+                and_out = self.forward_gates.get((x, y, "AND"))
+
+                a, b = (carry, xor_out) if carry <= xor_out else (xor_out, carry)
+                carry = self.forward_gates.get((a, b, "AND"))
+                a, b = (carry, and_out) if carry <= and_out else (and_out, carry)
+                carry = self.forward_gates.get((a, b, "OR"))
+
+        return sorted(self.output_wires)
 
 
 def main():
-    parse_input()
-    solve(operations, initial_port_state)
-    res = ""
-    final_ports = []
-    for key, value in initial_port_state.items():
-        if key.startswith("z"):
-            final_ports.append((key, value))
+    adder = BinaryAdder()
+    adder.parse_input("input.txt")
 
-    final_ports.sort(reverse=True)
-    for port in final_ports:
-        res += str(port[1])
-
-    print(res)
-    print(int(res, 2))
+    swapped_wires = adder.find_swapped_wires()
+    if swapped_wires:
+        print(",".join(swapped_wires))
+    else:
+        print("No solution found")
 
 
 if __name__ == "__main__":
